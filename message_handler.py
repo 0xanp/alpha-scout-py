@@ -2,6 +2,7 @@ import re
 from typing import Optional
 from google_sheets_reader import GoogleSheetReader
 from airtabler import Airtabler
+import os
 
 class MessageHandler:
     STATUS = {
@@ -14,24 +15,26 @@ class MessageHandler:
 
     def __init__(self):
         self.status = MessageHandler.STATUS['NONE']
-    
-    def twitter_handle_match(self, message: str) -> Optional[str]:
-        twitter_handle = re.match(r'twitter\.com\/(?P<twitterHandle>[a-zA-Z0-9_]+)', message)
-        return twitter_handle.groupdict().get('twitterHandle') if twitter_handle else None
-    
-    def url_match(self, url: str) -> Optional[str]:
-        url_match = re.findall(r'http(s)?:\/\/(?:www\.|)+(?:[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)', url)
-        return url_match[0] if url_match else None
-    
-    def parse_launch_date(self, message: str, twitter_handle: Optional[str] = None) -> Optional[str]:
-        if not twitter_handle:
-            twitter_handle = self.twitter_handle_match(message)
-        url = self.url_match(message)
+
+    def twitterHandleMatch(self, message: str) -> str:
+        match = re.search(r"twitter\.com\/(?P<twitterHandle>[a-zA-Z0-9_]+)", message)
+        if match:
+            return match.group("twitterHandle")
+
+    def urlMatch(self, url: str) -> str:
+        match = re.search(r'(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)', url)
+        if match:
+            return match.group(0)
+
+    def parseLaunchDate(self, message: str, twitterHandle: str = None) -> str:
+        if not twitterHandle:
+            twitterHandle = self.twitterHandleMatch(message)
+        url = self.urlMatch(message)
         if not url:
-            raise ValueError(f'There is not URL in this message: "{message}"')
-        launch_date = message.replace(url, '')
-        launch_date = re.sub(r'^[^a-z\d]*|[^a-z\d]*$', '', launch_date, flags=re.IGNORECASE) 
-        return launch_date
+            raise ValueError(f"There is not URL in this message: '{message}'")
+        launchDate = message.replace(url, "")
+        launchDate = re.sub(r"^[^a-z\d]*|[^a-z\d]*$", "", launchDate, flags=re.IGNORECASE)
+        return launchDate
 
     async def handle(self, message: str, author: str):
         twitterHandle = self.twitterHandleMatch(message)
@@ -61,7 +64,7 @@ class MessageHandler:
 
     async def doesRecordExist(self, twitterLink:str) -> bool:
         airtabler = Airtabler()
-        records = await airtabler.findRecord(twitterLink)
+        records = await airtabler.find_record(twitterLink)
         if records and len(records) > 0:
             return True
         reader = GoogleSheetReader()

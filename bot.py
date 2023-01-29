@@ -2,8 +2,10 @@ import discord
 from discord.ext import commands
 from message_handler import MessageHandler
 import os
+from dotenv import load_dotenv
 
-client = commands.Bot(command_prefix='!')
+load_dotenv()
+client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
 @client.event
 async def on_ready():
@@ -19,14 +21,15 @@ async def on_message(message):
     if message.author.bot:
         return
     handler = MessageHandler()
+    print(message.content)
     result = await handler.handle(message.content, message_username(message))
-    if result == MessageHandler.STATUS.BAD_TWITTER_LINK:
+    if result == MessageHandler.STATUS['BAD_TWITTER_LINK']:
         await message.channel.send(f":x: Invalid Format: Please enter the project Twitter link (i.e. it should start with https://www.twitter.com/)\n{EXAMPLES}")
-    elif result == MessageHandler.STATUS.DB_SUCCESS:
+    elif result == MessageHandler.STATUS['DB_SUCCESS']:
         await message.channel.send(":white_check_mark: Thank You! Successfully Saved")
-    elif result == MessageHandler.STATUS.DUPLICATE_RECORD:
+    elif result == MessageHandler.STATUS['DUPLICATE_RECORD']:
         await message.channel.send(":x: That NFT project has already been added")
-    elif result == MessageHandler.STATUS.DB_SAVING_ERROR:
+    elif result == MessageHandler.STATUS['DB_SAVING_ERROR']:
         await message.channel.send(":x: ERROR saving to the database, please contact an admin")
 
-client.run(os.environ['DISCORD_BOT_TOKEN'])
+client.run(os.environ.get('DISCORD_BOT_TOKEN'))

@@ -2,6 +2,9 @@ import os
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SHEET_NAME = "Master ML Alpha Calendar"
 
