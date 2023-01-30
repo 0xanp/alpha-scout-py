@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 from google_sheets_reader import GoogleSheetReader
 from airtabler import Airtabler
 import os
@@ -16,44 +15,44 @@ class MessageHandler:
     def __init__(self):
         self.status = MessageHandler.STATUS['NONE']
 
-    def twitterHandleMatch(self, message: str) -> str:
-        match = re.search(r"twitter\.com\/(?P<twitterHandle>[a-zA-Z0-9_]+)", message)
+    def twitter_handle_match(self, message: str) -> str:
+        match = re.search(r"twitter\.com\/(?P<twitter_handle>[a-zA-Z0-9_]+)", message)
         if match:
-            return match.group("twitterHandle")
+            return match.group("twitter_handle")
 
-    def urlMatch(self, url: str) -> str:
+    def url_match(self, url: str) -> str:
         match = re.search(r'(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)', url)
         if match:
             return match.group(0)
 
-    def parseLaunchDate(self, message: str, twitterHandle: str = None) -> str:
-        if not twitterHandle:
-            twitterHandle = self.twitterHandleMatch(message)
-        url = self.urlMatch(message)
+    def parse_launch_date(self, message: str, twitter_handle: str = None) -> str:
+        if not twitter_handle:
+            twitter_handle = self.twitter_handle_match(message)
+        url = self.url_match(message)
         if not url:
             raise ValueError(f"There is not URL in this message: '{message}'")
-        launchDate = message.replace(url, "")
-        launchDate = re.sub(r"^[^a-z\d]*|[^a-z\d]*$", "", launchDate, flags=re.IGNORECASE)
-        return launchDate
+        launch_date = message.replace(url, "")
+        launch_date = re.sub(r"^[^a-z\d]*|[^a-z\d]*$", "", launch_date, flags=re.IGNORECASE)
+        return launch_date
 
     async def handle(self, message: str, author: str):
-        twitterHandle = self.twitterHandleMatch(message)
-        if not twitterHandle:
+        twitter_handle = self.twitter_handle_match(message)
+        if not twitter_handle:
             self.status = MessageHandler.STATUS["BAD_TWITTER_LINK"]
             return self.status
-        twitterLink = f"https://twitter.com/{twitterHandle}"
-        launchDate = self.parseLaunchDate(message, twitterHandle)
+        twitter_link = f"https://twitter.com/{twitter_handle}"
+        launch_date = self.parse_launch_date(message, twitter_handle)
 
-        if not twitterLink:
+        if not twitter_link:
             self.status = MessageHandler.STATUS["BAD_TWITTER_LINK"]
             return self.status
 
-        if await self.doesRecordExist(twitterLink):
+        if await self.does_record_exist(twitter_link):
             self.status = MessageHandler.STATUS["DUPLICATE_RECORD"]
             return self.status   
         airtabler = Airtabler()
         try:
-            records = await airtabler.createRecord(twitterLink, launchDate, author)
+            records = await airtabler.create_record(twitter_link, launch_date, author)
             if records and len(records) > 0:
                 return MessageHandler.STATUS["DB_SUCCESS"]
         except Exception as err:
@@ -62,14 +61,14 @@ class MessageHandler:
                 print(err)
             return MessageHandler.STATUS["DB_SAVING_ERROR"]
 
-    async def doesRecordExist(self, twitterLink:str) -> bool:
+    async def does_record_exist(self, twitter_link:str) -> bool:
         airtabler = Airtabler()
-        records = await airtabler.find_record(twitterLink)
+        records = await airtabler.find_record(twitter_link)
         if records and len(records) > 0:
             return True
         reader = GoogleSheetReader()
-        lowerCaseTwitter = twitterLink.lower()
-        sheetEntries = await reader.readData()
-        if sheetEntries and lowerCaseTwitter in sheetEntries:
+        lower_case_twitter = twitter_link.lower()
+        sheet_entries = await reader.read_data()
+        if sheet_entries and lower_case_twitter in sheet_entries:
             return True
         return False

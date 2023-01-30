@@ -16,5 +16,5 @@ class Airtabler:
         records = airtable.insert({"Twitter Link": twitter_link, "Author": author, "Launch Date": launch_date})
         return records
 
-    def find_record(self, twitter_link: str) -> dict:
+    async def find_record(self, twitter_link: str) -> dict:
         return airtable.search("Twitter Link", twitter_link.lower())

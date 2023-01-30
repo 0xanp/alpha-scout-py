@@ -21,7 +21,6 @@ async def on_message(message):
     if message.author.bot:
         return
     handler = MessageHandler()
-    print(message.content)
     result = await handler.handle(message.content, message_username(message))
     if result == MessageHandler.STATUS['BAD_TWITTER_LINK']:
         await message.channel.send(f":x: Invalid Format: Please enter the project Twitter link (i.e. it should start with https://www.twitter.com/)\n{EXAMPLES}")
