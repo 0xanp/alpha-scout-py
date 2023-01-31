@@ -17,4 +17,4 @@ class Airtabler:
         return records
 
     async def find_record(self, twitter_link: str) -> dict:
-        return airtable.search("Twitter Link", twitter_link.lower())
+        return airtable.search("Twitter Link", twitter_link)
