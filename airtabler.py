@@ -11,7 +11,7 @@ airtable = Airtable(airtable_base, airtable_table_name, airtable_api_key)
 
 class Airtabler:
 
-    async def create_record(self, twitter_link: str, launch_date: str, author: str) -> dict:
+    async def create_record(self, twitter_link: str, launch_date: str, author: str) -> list:
         print("createRecord")
         records = airtable.insert({"Twitter Link": twitter_link, "Author": author, "Launch Date": launch_date})
         return records
