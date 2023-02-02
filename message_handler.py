@@ -67,8 +67,7 @@ class MessageHandler:
         if records and len(records) > 0:
             return True
         reader = GoogleSheetReader()
-        lower_case_twitter = twitter_link.lower()
         sheet_entries = await reader.read_data()
-        if sheet_entries and lower_case_twitter in sheet_entries:
+        if sheet_entries and twitter_link in sheet_entries:
             return True
         return False
