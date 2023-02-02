@@ -68,6 +68,6 @@ class MessageHandler:
             return True
         reader = GoogleSheetReader()
         sheet_entries = await reader.read_data()
-        if sheet_entries and twitter_link in sheet_entries:
+        if sheet_entries and twitter_link.lower() in sheet_entries:
             return True
         return False

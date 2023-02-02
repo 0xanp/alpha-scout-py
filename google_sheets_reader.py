@@ -13,4 +13,4 @@ class GoogleSheetReader:
         df = pd.read_excel(self.spreadsheet_url, usecols="D")
         # every twitter links to lowercase for comparison
         df = df.astype(str).apply(lambda x: x.str.lower())
-        return df.values.tolist()
+        return [url[0] for url in df.values.tolist()]
