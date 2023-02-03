@@ -23,12 +23,12 @@ async def on_message(message):
     handler = MessageHandler()
     result = await handler.handle(message.content, message_username(message))
     if result == MessageHandler.STATUS['BAD_TWITTER_LINK']:
-        await message.channel.send(f":x: Invalid Format: Please enter the project Twitter link (i.e. it should start with https://www.twitter.com/)\n{EXAMPLES}")
+        await message.reply(f":x: Invalid Format: Please enter the project Twitter link (i.e. it should start with https://www.twitter.com/)\n{EXAMPLES}")
     elif result == MessageHandler.STATUS['DB_SUCCESS']:
-        await message.channel.send(":white_check_mark: Thank You! Successfully Saved")
+        await message.reply(":white_check_mark: Thank You! Successfully Saved")
     elif result == MessageHandler.STATUS['DUPLICATE_RECORD']:
-        await message.channel.send(":x: That NFT project has already been added")
+        await message.reply(":x: That NFT project has already been added")
     elif result == MessageHandler.STATUS['DB_SAVING_ERROR']:
-        await message.channel.send(":x: ERROR saving to the database, please contact an admin")
+        await message.reply(":x: ERROR saving to the database, please contact an admin")
 
 client.run(os.environ.get('DISCORD_BOT_TOKEN'))
