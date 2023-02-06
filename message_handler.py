@@ -41,7 +41,7 @@ class MessageHandler:
             self.status = MessageHandler.STATUS["BAD_TWITTER_LINK"]
             return self.status
         twitter_link = f"https://twitter.com/{twitter_handle}"
-        launch_date = self.parse_launch_date(message, twitter_handle)git
+        launch_date = self.parse_launch_date(message, twitter_handle)
 
         if await self.does_record_exist(twitter_link):
             self.status = MessageHandler.STATUS["DUPLICATE_RECORD"]
