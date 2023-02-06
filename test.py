@@ -4,11 +4,11 @@ from airtabler import Airtabler
 from message_handler import MessageHandler
 from google_sheets_reader import GoogleSheetReader
 import faker
-import asyncio
 
-class TestAirtabler(unittest.TestCase):
-    airtabler = Airtabler()
-    TWITTER_LINK_RECORD = "https://twitter.com/a_new_nft_project44"
+class TestAirtabler(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.airtabler = Airtabler()
+        self.TWITTER_LINK_RECORD = "https://twitter.com/a_new_nft_project44"
 
     async def test_create_record(self):
         print("\nTESTING create_record...")
@@ -30,7 +30,7 @@ class TestAirtabler(unittest.TestCase):
         self.assertEqual(records[0]['fields']["Twitter Link"], twitter_link)
         print("PASSED")
 
-class TestGoogleSheetReader(unittest.TestCase):
+class TestGoogleSheetReader(unittest.IsolatedAsyncioTestCase):
     async def test_read_data(self):
         print("\nTESTING google_sheets_reader...")
         reader = GoogleSheetReader()
@@ -40,9 +40,10 @@ class TestGoogleSheetReader(unittest.TestCase):
         self.assertTrue("https://twitter.com/metapeeps" in data)
         print("PASSED")
 
-class TestMessageHandler(unittest.TestCase):
-    handler = MessageHandler()
-    DUPLICATE_TWITTER_LINK = "https://twitter.com/a_new_nft_project44"
+class TestMessageHandler(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.handler = MessageHandler()
+        self.DUPLICATE_TWITTER_LINK = "https://twitter.com/a_new_nft_project44"
 
     async def test_does_record_exist(self):
         print("\nTESTING does_record_exist...")
@@ -196,24 +197,6 @@ class TestMessageHandler(unittest.TestCase):
         self.assertEqual(self.handler.parse_launch_date(message), "5, 2023")
         print("PASSED")
 
-async def main():
-    print("Testing Alpha Scout Bot...")
-    # Testing airtabler
-    airtabler_tester = TestAirtabler()
-    await airtabler_tester.test_create_record()
-    await airtabler_tester.test_find_record()
-    # Testing google_sheets_reader
-    google_sheets_reader_tester = TestGoogleSheetReader()
-    await google_sheets_reader_tester.test_read_data()
-    # Testing message_handler
-    message_handler_tester = TestMessageHandler()
-    await message_handler_tester.test_handle()
-    await message_handler_tester.test_does_record_exist()
-    message_handler_tester.test_url_match()
-    message_handler_tester.test_parse_launch_date()
-    message_handler_tester.test_twitter_handle_match()
-    print("\nDone Testing Alpha Scout Bot!")
-
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    unittest.main()
+
