@@ -40,7 +40,7 @@ class MessageHandler:
         if not twitter_handle:
             self.status = MessageHandler.STATUS["BAD_TWITTER_LINK"]
             return self.status
-        twitter_link = f"https://twitter.com/{twitter_handle}"
+        twitter_link = f"https://twitter.com/{twitter_handle.lower()}"
         launch_date = self.parse_launch_date(message, twitter_handle)
 
         if not twitter_link:
