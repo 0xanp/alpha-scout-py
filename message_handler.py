@@ -52,6 +52,25 @@ class MessageHandler:
             return True
         return False
 
+    async def handle_existing(self, twitter_link, message, launch_date):
+        status_id = self.tweet_status_id_match(message)
+        announcement = f"{twitter_link}/status/{status_id}"
+        
+        if await self.does_record_exist_existing(announcement):
+            self.status = MessageHandler.STATUS["DUPLICATE_RECORD"]
+            return self.status   
+        airtabler_existing = AirtablerExisting()
+
+        try:
+            records = await airtabler_existing.create_record(twitter_link, announcement, author, launch_date)
+            if records and len(records) > 0:
+                return MessageHandler.STATUS["DB_SUCCESS"]
+        except Exception as err:
+            if "NODE_ENV" not in os.environ or os.environ["NODE_ENV"] != "test":
+                print("error saving to DB")
+                print(err)
+            return MessageHandler.STATUS["DB_SAVING_ERROR"]
+    
     async def handle(self, message: str, author: str):
         # first we run the message through the new project flow
         twitter_handle = self.twitter_handle_match(message)
@@ -66,24 +85,12 @@ class MessageHandler:
             if not await self.is_notable(twitter_link):
                 return MessageHandler.STATUS["NOT_FROM_NFT_LIST"]
 
-            status_id = self.tweet_status_id_match(message)
-            announcement = f"{twitter_link}/status/{status_id}"
-            
-            if await self.does_record_exist_existing(announcement):
-                self.status = MessageHandler.STATUS["DUPLICATE_RECORD"]
-                return self.status   
-            airtabler_existing = AirtablerExisting()
-
-            try:
-                records = await airtabler_existing.create_record(twitter_link, announcement, author, launch_date)
-                if records and len(records) > 0:
-                    return MessageHandler.STATUS["DB_SUCCESS"]
-            except Exception as err:
-                if "NODE_ENV" not in os.environ or os.environ["NODE_ENV"] != "test":
-                    print("error saving to DB")
-                    print(err)
-                return MessageHandler.STATUS["DB_SAVING_ERROR"]
+            await handle_existing(twitter_link, message, launch_date)
         
+        # if the project is notable we run it through the exisiting project flow immediately
+        elif await self.is_notable(twitter_link):
+            await handle_existing(twitter_link, message, launch_date)
+            
         # if it's just a duplicate handle entry then we reject
         elif await self.does_record_exist(twitter_link) and not self.is_twitter_status(message):
             return MessageHandler.STATUS["DUPLICATE_RECORD"]
