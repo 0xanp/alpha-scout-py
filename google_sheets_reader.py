@@ -9,8 +9,15 @@ class GoogleSheetReader:
         if not os.environ.get('GOOGLE_SHEET_URL'):
             raise ValueError("No env variable for google sheets")
         self.spreadsheet_url= os.environ.get('GOOGLE_SHEET_URL')
+        self.notable_spreadsheet_url = os.environ.get('NOTABLE_GOOGLE_SHEET_URL')
+        
     async def read_data(self):
         df = pd.read_excel(self.spreadsheet_url, usecols="D")
         # every twitter links to lowercase for comparison
         df = df.astype(str).apply(lambda x: x.str.lower())
         return [url[0] for url in df.values.tolist()]
+    
+    async def read_notable_data(self):
+        df = pd.read_excel(self.notable_spreadsheet_url, usecols="A")
+        df = df.astype(str).apply(lambda x: x.str.lower())
+        return [url[0] for url in df.values.tolist()] 
