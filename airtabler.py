@@ -12,25 +12,24 @@ airtable_table_name = os.environ.get('AIRTABLE_TABLE_NAME')
 exisiting_airtable_api_key = os.environ.get('EXISTING_AIRTABLE_API_KEY')
 exisiting_airtable_base = os.environ.get('EXISTING_AIRTABLE_BASE')
 exisiting_airtable_table_name = os.environ.get('EXISTING_AIRTABLE_TABLE_NAME')
+airtabler_existing = Airtable(exisiting_airtable_base, exisiting_airtable_table_name, exisiting_airtable_api_key)
+airtable = Airtable(airtable_base, airtable_table_name, airtable_api_key)
 
 class Airtabler:
-    def __init__(self):
-        self.airtable = Airtable(airtable_base, airtable_table_name, airtable_api_key)
     async def create_record(self, twitter_link: str, launch_date: str, author: str) -> list:
         print("createRecord")
-        records = self.airtable.insert({"Twitter Link": twitter_link, "Author": author, "Launch Date": launch_date})
+        records = airtable.insert({"Twitter Link": twitter_link, "Author": author, "Launch Date": launch_date})
         return records
 
     async def find_record(self, twitter_link: str) -> dict:
-        return self.airtable.search("Twitter Link", twitter_link)
+        return airtable.search("Twitter Link", twitter_link)
 
 class AirtablerExisting:
-    def __init__(self):
-        self.airtabler_existing = Airtable(exisiting_airtable_base, exisiting_airtable_table_name, exisiting_airtable_api_key)
+
     async def create_record(self, twitter_profile: str, announcement: str, author: str, scout_comment: str) -> dict:
         print("createRecord")
-        records = self.airtabler_existing.insert({"Twitter Profile": twitter_profile,"Announcement": announcement, "Author": author, "Scout Comment": scout_comment})
+        records = airtabler_existing.insert({"Twitter Profile": twitter_profile,"Announcement": announcement, "Author": author, "Scout Comment": scout_comment})
         return records
 
     async def find_announcement_record(self, announcement: str) -> dict:
-        return self.airtabler_existing.search("Announcement", announcement)
+        return airtabler_existing.search("Announcement", announcement)
