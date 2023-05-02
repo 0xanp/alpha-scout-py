@@ -85,12 +85,12 @@ class MessageHandler:
             if not await self.is_notable(twitter_link):
                 return MessageHandler.STATUS["NOT_FROM_NFT_LIST"]
 
-            await handle_existing(twitter_link, message, launch_date)
+            await self.handle_existing(twitter_link, message, launch_date)
         
         # if the project is notable we run it through the exisiting project flow immediately
         elif await self.is_notable(twitter_link):
-            await handle_existing(twitter_link, message, launch_date)
-            
+            await self.handle_existing(twitter_link, message, launch_date)
+
         # if it's just a duplicate handle entry then we reject
         elif await self.does_record_exist(twitter_link) and not self.is_twitter_status(message):
             return MessageHandler.STATUS["DUPLICATE_RECORD"]

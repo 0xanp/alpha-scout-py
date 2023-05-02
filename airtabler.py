@@ -14,7 +14,8 @@ exisiting_airtable_base = os.environ.get('EXISTING_AIRTABLE_BASE')
 exisiting_airtable_table_name = os.environ.get('EXISTING_AIRTABLE_TABLE_NAME')
 
 class Airtabler:
-    self.airtable = Airtable(airtable_base, airtable_table_name, airtable_api_key)
+    def __init__(self):
+        self.airtable = Airtable(airtable_base, airtable_table_name, airtable_api_key)
     async def create_record(self, twitter_link: str, launch_date: str, author: str) -> list:
         print("createRecord")
         records = self.airtable.insert({"Twitter Link": twitter_link, "Author": author, "Launch Date": launch_date})
@@ -24,8 +25,8 @@ class Airtabler:
         return self.airtable.search("Twitter Link", twitter_link)
 
 class AirtablerExisting:
-    self.airtabler_existing = Airtable(exisiting_airtable_base, exisiting_airtable_table_name, exisiting_airtable_api_key)
-
+    def __init__(self):
+        self.airtabler_existing = Airtable(exisiting_airtable_base, exisiting_airtable_table_name, exisiting_airtable_api_key)
     async def create_record(self, twitter_profile: str, announcement: str, author: str, scout_comment: str) -> dict:
         print("createRecord")
         records = self.airtabler_existing.insert({"Twitter Profile": twitter_profile,"Announcement": announcement, "Author": author, "Scout Comment": scout_comment})
