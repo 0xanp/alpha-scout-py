@@ -8,9 +8,9 @@ class MessageHandler:
         'NONE': 'NONE',
         'BAD_TWITTER_LINK': 'BAD_TWITTER_LINK',
         'DUPLICATE_RECORD': 'DUPLICATE_RECORD',
-        'NOT_FROM_NFT_LIST': 'NOT_FROM_NFT_LIST',
         'DB_SUCCESS': 'DB_SUCCESS',
-        'DB_SAVING_ERROR': 'DB_SAVING_ERROR'
+        'DB_SAVING_ERROR': 'DB_SAVING_ERROR',
+        'NOTABLE_BUT_NO_ANNOUNCEMENT':'NOTABLE_BUT_NO_ANNOUNCEMENT'
     }
 
     def __init__(self):
@@ -85,7 +85,7 @@ class MessageHandler:
         # if the project is notable we run it through the exisiting project flow immediately
         elif await self.is_notable(twitter_link):
             if not self.is_twitter_status(message):
-                return MessageHandler.STATUS["BAD_TWITTER_LINK"]
+                return MessageHandler.STATUS["NOTABLE_BUT_NO_ANNOUNCEMENT"]
             status_id = self.tweet_status_id_match(message)
             announcement = f"{twitter_link}/status/{status_id}"
             if await self.does_record_exist_existing(announcement):

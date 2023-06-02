@@ -24,13 +24,13 @@ async def on_message(message):
     result = await handler.handle(message.content, message_username(message))
     if result == MessageHandler.STATUS['BAD_TWITTER_LINK']:
         await message.reply(f":x: Invalid Format: Please enter the project Twitter handle link or project Twitter status link (i.e. it should start with https://www.twitter.com/)\n{EXAMPLES}")
-    elif result == MessageHandler.STATUS['NOT_FROM_NFT_LIST']:
-        await message.reply(":x: Please submit an announcement of a project from this list https://docs.google.com/spreadsheets/d/1gu1ZY7HCZH87RwqNOvjgJI3xog7qwhN_A43JzyQF1Pc/edit?usp=sharing")
     elif result == MessageHandler.STATUS['DB_SUCCESS']:
         await message.reply(":white_check_mark: Thank You! Successfully Saved")
     elif result == MessageHandler.STATUS['DUPLICATE_RECORD']:
         await message.reply(":x: That NFT project has already been added")
     elif result == MessageHandler.STATUS['DB_SAVING_ERROR']:
         await message.reply(":x: ERROR saving to the database, please contact an admin")
+    elif result == MessageHandler.STATUS['NOTABLE_BUT_NO_ANNOUNCEMENT']:
+        await message.reply(":x: You entered a twitter profile from the notable list (https://docs.google.com/spreadsheets/d/1gu1ZY7HCZH87RwqNOvjgJI3xog7qwhN_A43JzyQF1Pc/edit?usp=sharing), but no twitter link to a new announcement was found, please enter a twitter link to the announcement")
 
 client.run(os.environ.get('DISCORD_BOT_TOKEN'))
