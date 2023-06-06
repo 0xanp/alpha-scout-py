@@ -61,17 +61,16 @@ class MessageHandler:
         twitter_link = f"https://twitter.com/{twitter_handle.lower()}"
         launch_date = self.parse_launch_date(message, twitter_handle)
         
-        # if found duplicate in new project flow but the message is a status, we switch to existing project flow
-        if await self.does_record_exist(twitter_link) and self.is_twitter_status(message):
-            if not await self.is_notable(twitter_link):
-                return MessageHandler.STATUS["DUPLICATE_RECORD"]
-
+        # if the project is notable we run it through the exisiting project flow immediately
+        if await self.is_notable(twitter_link):
+            if not self.is_twitter_status(message):
+                return MessageHandler.STATUS["NOTABLE_BUT_NO_ANNOUNCEMENT"]
             status_id = self.tweet_status_id_match(message)
             announcement = f"{twitter_link}/status/{status_id}"
             if await self.does_record_exist_existing(announcement):
+                print("record existed")
                 return MessageHandler.STATUS["DUPLICATE_RECORD"]
             airtabler_existing = AirtablerExisting()
-
             try:
                 records = await airtabler_existing.create_record(twitter_link, announcement, author, launch_date)
                 if records and len(records) > 0:
@@ -81,17 +80,18 @@ class MessageHandler:
                     print("error saving to DB")
                     print(err)
                 return MessageHandler.STATUS["DB_SAVING_ERROR"]
-        
-        # if the project is notable we run it through the exisiting project flow immediately
-        elif await self.is_notable(twitter_link):
-            if not self.is_twitter_status(message):
-                return MessageHandler.STATUS["NOTABLE_BUT_NO_ANNOUNCEMENT"]
+
+        # if found duplicate in new project flow but the message is a status, we switch to existing project flow
+        elif await self.does_record_exist(twitter_link) and self.is_twitter_status(message):
+            if not await self.is_notable(twitter_link):
+                return MessageHandler.STATUS["DUPLICATE_RECORD"]
+
             status_id = self.tweet_status_id_match(message)
             announcement = f"{twitter_link}/status/{status_id}"
             if await self.does_record_exist_existing(announcement):
-                print("record existed")
                 return MessageHandler.STATUS["DUPLICATE_RECORD"]
             airtabler_existing = AirtablerExisting()
+
             try:
                 records = await airtabler_existing.create_record(twitter_link, announcement, author, launch_date)
                 if records and len(records) > 0:
