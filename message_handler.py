@@ -17,7 +17,7 @@ class MessageHandler:
         self.status = MessageHandler.STATUS['NONE']
 
     def twitter_handle_match(self, message: str) -> str:
-        match = re.search(r"twitter\.com\/(?P<twitter_handle>[a-zA-Z0-9_]+)", message)
+        match = re.search(r"(twitter|x)\.com\/(?P<twitter_handle>[a-zA-Z0-9_]+)", message)
         if match:
             return match.group("twitter_handle")
 
@@ -37,7 +37,7 @@ class MessageHandler:
         return launch_date
     
     def is_twitter_status(self, message: str) -> bool:
-        pattern = r"^(https://twitter.com/|https://mobile.twitter.com/)(\w+)/status/*"
+        pattern = r"^(https://twitter.com/|https://mobile.twitter.com/|https://x.com/|https://x.twitter.com/)(\w+)/status/*"
         match = re.search(pattern, message)
         return bool(match)
 
